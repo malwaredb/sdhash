@@ -6,11 +6,13 @@
 #include <math.h>
 #include "sdbf_class.h"
 #include "sdbf_conf.h"
+#include "bits_counter.h"
 #include <boost/math/special_functions/round.hpp>
 
-#ifndef _M_IX86
+/*#ifndef _M_IX86
 #include <smmintrin.h>
-#endif
+#endif*/
+
 /**
  * Estimate number of expected matching bits
  */
@@ -86,11 +88,17 @@ bf_bitcount_cut_64_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_off
     buff64[1]= f1_64[1] & f2_64[1];
     buff64[2]= f1_64[2] & f2_64[2];
     buff64[3]= f1_64[3] & f2_64[3];
-#ifndef _M_IX86 // allowing win32 shortcut
-    result += _mm_popcnt_u64(buff64[0]);
+//#ifndef _M_IX86 // allowing win32 shortcut
+    /*result += _mm_popcnt_u64(buff64[0]);
     result += _mm_popcnt_u64(buff64[1]);
     result += _mm_popcnt_u64(buff64[2]);
-    result += _mm_popcnt_u64(buff64[3]);
+    result += _mm_popcnt_u64(buff64[3]);*/
+
+    result += countSetBits(buff64[0]);
+    result += countSetBits(buff64[1]);
+    result += countSetBits(buff64[2]);
+    result += countSetBits(buff64[3]);
+
     // First shortcircuit for the computation
     if( cut_off > 0 && (2*result + slack) < cut_off) {
         return 0;
@@ -99,12 +107,18 @@ bf_bitcount_cut_64_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_off
     buff64[5]= f1_64[5] & f2_64[5];
     buff64[6]= f1_64[6] & f2_64[6];
     buff64[7]= f1_64[7] & f2_64[7];
-    result += _mm_popcnt_u64(buff64[4]);
+    /*result += _mm_popcnt_u64(buff64[4]);
     result += _mm_popcnt_u64(buff64[5]);
     result += _mm_popcnt_u64(buff64[6]);
-    result += _mm_popcnt_u64(buff64[7]);
+    result += _mm_popcnt_u64(buff64[7]);*/
+
+    result += countSetBits(buff64[4]);
+    result += countSetBits(buff64[5]);
+    result += countSetBits(buff64[6]);
+    result += countSetBits(buff64[7]);
+
 // end of short filters
-#endif
+//#endif
     return result;
 
 }
@@ -122,11 +136,17 @@ bf_bitcount_cut_256_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_of
     buff64[1]= f1_64[1] & f2_64[1];
     buff64[2]= f1_64[2] & f2_64[2];
     buff64[3]= f1_64[3] & f2_64[3];
-#ifndef _M_IX86 // allowing win32 shortcut
-    result += _mm_popcnt_u64(buff64[0]);
+//#ifndef _M_IX86 // allowing win32 shortcut
+    /*result += _mm_popcnt_u64(buff64[0]);
     result += _mm_popcnt_u64(buff64[1]);
     result += _mm_popcnt_u64(buff64[2]);
-    result += _mm_popcnt_u64(buff64[3]);
+    result += _mm_popcnt_u64(buff64[3]);*/
+
+    result += countSetBits(buff64[0]);
+    result += countSetBits(buff64[1]);
+    result += countSetBits(buff64[2]);
+    result += countSetBits(buff64[3]);
+
     // First shortcircuit for the computation
     if( cut_off > 0 && (8*result + slack) < cut_off) {
         return 0;
@@ -135,10 +155,16 @@ bf_bitcount_cut_256_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_of
     buff64[5]= f1_64[5] & f2_64[5];
     buff64[6]= f1_64[6] & f2_64[6];
     buff64[7]= f1_64[7] & f2_64[7];
-    result += _mm_popcnt_u64(buff64[4]);
+    /*result += _mm_popcnt_u64(buff64[4]);
     result += _mm_popcnt_u64(buff64[5]);
     result += _mm_popcnt_u64(buff64[6]);
-    result += _mm_popcnt_u64(buff64[7]);
+    result += _mm_popcnt_u64(buff64[7]);*/
+
+    result += countSetBits(buff64[4]);
+    result += countSetBits(buff64[5]);
+    result += countSetBits(buff64[6]);
+    result += countSetBits(buff64[7]);
+
     // Second shortcircuit for the computation
     if( cut_off > 0 && (4*result + slack) < cut_off) {
         return 0;
@@ -152,14 +178,24 @@ bf_bitcount_cut_256_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_of
     buff64[14]= f1_64[14] & f2_64[14];
     buff64[15]= f1_64[15] & f2_64[15];
 
-    result += _mm_popcnt_u64(buff64[8]);
+    /*result += _mm_popcnt_u64(buff64[8]);
     result += _mm_popcnt_u64(buff64[9]);
     result += _mm_popcnt_u64(buff64[10]);
     result += _mm_popcnt_u64(buff64[11]);
     result += _mm_popcnt_u64(buff64[12]);
     result += _mm_popcnt_u64(buff64[13]);
     result += _mm_popcnt_u64(buff64[14]);
-    result += _mm_popcnt_u64(buff64[15]);
+    result += _mm_popcnt_u64(buff64[15]);*/
+
+    result += countSetBits(buff64[8]);
+    result += countSetBits(buff64[9]);
+    result += countSetBits(buff64[10]);
+    result += countSetBits(buff64[11]);
+    result += countSetBits(buff64[12]);
+    result += countSetBits(buff64[13]);
+    result += countSetBits(buff64[14]);
+    result += countSetBits(buff64[15]);
+
     // Third shortcircuit for the computation
     if( cut_off > 0 && (2*result + slack) < cut_off) {
         return 0;
@@ -181,7 +217,7 @@ bf_bitcount_cut_256_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_of
     buff64[30]= f1_64[30] & f2_64[30];
     buff64[31]= f1_64[31] & f2_64[31];
 
-    result += _mm_popcnt_u64(buff64[16]);
+    /*result += _mm_popcnt_u64(buff64[16]);
     result += _mm_popcnt_u64(buff64[17]);
     result += _mm_popcnt_u64(buff64[18]);
     result += _mm_popcnt_u64(buff64[19]);
@@ -196,8 +232,25 @@ bf_bitcount_cut_256_asm( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t cut_of
     result += _mm_popcnt_u64(buff64[28]);
     result += _mm_popcnt_u64(buff64[29]);
     result += _mm_popcnt_u64(buff64[30]);
-    result += _mm_popcnt_u64(buff64[31]);
-#endif
+    result += _mm_popcnt_u64(buff64[31]);*/
+
+    result += countSetBits(buff64[16]);
+    result += countSetBits(buff64[17]);
+    result += countSetBits(buff64[18]);
+    result += countSetBits(buff64[19]);
+    result += countSetBits(buff64[20]);
+    result += countSetBits(buff64[21]);
+    result += countSetBits(buff64[22]);
+    result += countSetBits(buff64[23]);
+    result += countSetBits(buff64[24]);
+    result += countSetBits(buff64[25]);
+    result += countSetBits(buff64[26]);
+    result += countSetBits(buff64[27]);
+    result += countSetBits(buff64[28]);
+    result += countSetBits(buff64[29]);
+    result += countSetBits(buff64[30]);
+    result += countSetBits(buff64[31]);
+//#endif
     //for( i=0; i<32; i++) {
        //result += _mm_popcnt_u64(buff64[i]);
         //result += sdbf::config->bit_count_16[buff16[i]];
@@ -394,7 +447,3 @@ uint32_t bf_bitcount_cut_256( uint8_t *bfilter_1, uint8_t *bfilter_2, uint32_t c
     result += sdbf::config->bit_count_16[buff16[127]];
     return result;
 }
-
-
-
-

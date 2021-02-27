@@ -2,14 +2,15 @@
 //
 
 #include "bloom_filter.h"
-
+#include "bits_counter.h"
 #include <iostream>
 #include <fstream>
 #include <sstream>
+#include <bits/stdc++.h>
 #include <boost/lexical_cast.hpp>
-#ifndef _M_IX86
-#include <smmintrin.h> 
-#endif
+//#ifndef _M_IX86
+//#include <smmintrin.h>
+//#endif
 
 #include <boost/math/special_functions/round.hpp>
 
@@ -367,7 +368,8 @@ bloom_filter::compare(bloom_filter *other, double scale) {
     int64_t res=0;
 #ifndef _M_IX86
     for (uint32_t i=0 ; i < bf_size / 8 ; i++) {
-        res+=_mm_popcnt_u64(bf_64[i] & bf2_64[i]);
+        //res+=_mm_popcnt_u64(bf_64[i] & bf2_64[i]);
+        res += (bf_64[i] & bf2_64[i]) & 1;
     }
 #endif
     int max_est = (this->hamminglg < other->hamminglg) ? this->hamminglg : other->hamminglg;
@@ -453,10 +455,14 @@ void
 bloom_filter::compute_hamming() {
     hamming=0;
     hamminglg=0;
+    //int hamingNew=0;
     uint64_t *b64 = (uint64_t *)this->bf;
-#ifndef _M_IX86
+//#ifndef _M_IX86
     for( uint32_t j=0; j<bf_size/8; j++) {
-        hamminglg += _mm_popcnt_u64(b64[j]);
+        //hamminglg += _mm_popcnt_u64(b64[j]);
+        //hamingNew += b64[j] & 1;
+        hamminglg += countSetBits(b64[j]);
     }
-#endif
+//#endif
+
 }

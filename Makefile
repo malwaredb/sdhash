@@ -6,9 +6,11 @@ INSTDIR=$(PREFIX)/bin
 MANDIR=$(PREFIX)/share/man/man1
 
 
-SDBF_SRC = sdbf/sdbf_class.cc sdbf/sdbf_core.cc sdbf/map_file.cc sdbf/entr64.cc sdbf/base64.cc sdbf/bf_utils.cc sdbf/error.cc sdbf/sdbf_conf.cc sdbf/sdbf_set.cc base64/modp_b64.cc sdbf/bloom_filter.cc lz4/lz4.cc sdbf/bloom_vector.cc sdbf/blooms.pb.cc
+SDBF_SRC = sdbf/sdbf_class.cc sdbf/sdbf_core.cc sdbf/map_file.cc sdbf/entr64.cc sdbf/base64.cc sdbf/bf_utils.cc sdbf/error.cc sdbf/sdbf_conf.cc sdbf/sdbf_set.cc base64/modp_b64.cc sdbf/bloom_filter.cc lz4/lz4.cc sdbf/bloom_vector.cc sdbf/blooms.pb.cc sdbf/bits_counter.cc
 
-SDHASH_SRC = sdhash-src/sdhash.cc sdhash-src/sdhash_threads.cc 
+SDHASH_SRC = sdhash-src/sdhash.cc sdhash-src/sdhash_threads.cc
+
+SDHASHLIB_SRC = sdhash-dynamiclib/sdhash.cc sdhash-dynamiclib/helper.cc
 
 BLOOM_TEST = test/bloom-test.cc test/modp_b16.cc 
 
@@ -18,9 +20,9 @@ LD = $(CC)
 
 # BAD, BAD OPTIMIZATION! -fstrict-aliasing 
 ifneq ($(MAKECMDGOALS),debug)
-CFLAGS = -fPIC -fopenmp -msse4.2 -O3 -fno-strict-aliasing -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_API -D_BSD_SOURCE -I./external 
+CFLAGS = -fPIC -fopenmp -O3 -fno-strict-aliasing -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_API -D_BSD_SOURCE -I./external
 else
-CFLAGS = -fPIC -fopenmp -msse4.2 -O0 -g -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_API -D_BSD_SOURCE -I./external -Wall
+CFLAGS = -fPIC -fopenmp -O0 -g -D_FILE_OFFSET_BITS=64 -D_LARGE_FILE_API -D_BSD_SOURCE -I./external -Wall
 endif
 
 LDFLAGS = -fopenmp -L . -L./external/stage/lib -lboost_system -lboost_filesystem -lboost_program_options -lc -lm -lcrypto -lboost_thread -lpthread -lprotobuf
@@ -28,11 +30,12 @@ LDFLAGS = -fopenmp -L . -L./external/stage/lib -lboost_system -lboost_filesystem
 SDHASH_OBJ = $(SDHASH_SRC:.cc=.o)
 SDBF_OBJ = $(SDBF_SRC:.cc=.o)
 BLOOM_TEST_OBJ = $(BLOOM_TEST:.cc=.o)
+SDHASHLIB_OBJ = $(SDHASHLIB_SRC:.cc=.o)
 
 
 LIBSDBF=libsdbf.a
 
-all: boost stream 
+all: boost stream libsdhash.so
 
 debug: boost stream 
 
@@ -78,8 +81,12 @@ swig/python/_sdbf_class.so: swig/python/sdbf_wrap.o $(LIBSDBF)
 
 sdbf.i:
 
-$(LIBSDBF): $(SDBF_OBJ) 
+$(LIBSDBF): $(SDBF_OBJ)
+	protoc --cpp_out=sdbf/ blooms.proto
 	ar r $(LIBSDBF) $(SDBF_OBJ)
+
+libsdhash.so: $(SDHASHLIB_OBJ) $(SDBF_OBJ)
+	$(LD) --shared $(SDHASHLIB_OBJ) $(LIBSDBF) -fPIC -o libsdhash.so
 
 stream: $(SDHASH_OBJ) $(LIBSDBF)
 	$(LD) $(SDHASH_OBJ) $(SDHASH_CLIENT_OBJ) $(LIBSDBF) -o sdhash $(LDFLAGS) 
@@ -105,10 +112,11 @@ gpu:
 	
 clean:
 	-@rm *.o sdhash sdhash-cli sdhash-srv 2> /dev/null || true
-	-@rm sdhash-src/*.o sdbf/*.o 2> /dev/null || true
+	-@rm sdhash-src/*.o sdbf/*.o sdhash-dynamiclib/*.o 2> /dev/null || true
 	-@rm base64/*.o 2> /dev/null || true
 	-@rm lz4/*.o 2> /dev/null || true
 	-@rm libsdbf.a 2> /dev/null || true
+	-@rm libsdhash.so 2> /dev/null || true
 
 veryclean: clean
 	cd external; ./b2 --clean ; cd -
