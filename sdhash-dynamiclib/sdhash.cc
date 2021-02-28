@@ -41,3 +41,21 @@ string sdhash_buffer(string file_name, char* buffer, uint64_t length) {
     free(info);
     return sdbfm.to_string();
 }
+
+int sdhash_compare_hashes(string hash1, string hash2) {
+    class sdbf sdhash1(hash1);
+    class sdbf sdhash2(hash2);
+    return sdhash1.compare(&sdhash2, 0);
+}
+
+int sdhash_compare_files(string fpath1, string fpath2) {
+    string hash1 = sdhash_file(fpath1);
+    string hash2 = sdhash_file(fpath2);
+    return sdhash_compare_hashes(hash1, hash2);
+}
+
+int sdhash_compare_buffers(char* buff1, uint64_t length1, char* buff2, uint64_t length2) {
+    string hash1 = sdhash_buffer("buffer1", buff1, length1);
+    string hash2 = sdhash_buffer("buffer2", buff2, length2);
+    return sdhash_compare_hashes(hash1, hash2);
+}

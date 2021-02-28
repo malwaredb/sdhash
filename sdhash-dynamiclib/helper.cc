@@ -19,4 +19,12 @@ extern "C" {
         temp = strdup(sdhash_result.c_str());
         return temp;
     }
+
+    int sdhash_compare_hashes_helper(char* hash1, char* hash2) {
+        return sdhash_compare_hashes(hash1, hash2);
+    }
+
+    int sdhash_compare_buffers_helper(char* buff1, uint64_t length1, char* buff2, uint64_t length2) {
+        return sdhash_compare_buffers(buff1, length1, buff2, length2);
+    }
 }

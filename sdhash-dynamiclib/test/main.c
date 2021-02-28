@@ -19,8 +19,11 @@ int main(int argc, char* argv[]) {
     buffer = NULL;
     fclose(f);
 
-    sdhashBuff = sdhash_from_path(argv[0]);
-    printf("Path:\n%s\n", sdhashBuff);
+    char* sdhashBuff2 = sdhash_from_path(argv[0]);
+    printf("Path:\n%s\n", sdhashBuff2);
+
+    int sim = sdhash_compare_hashes_helper(sdhashBuff, sdhashBuff2);
+    printf("Similarity: %d\n", sim);
 
 	return 0;
 }
