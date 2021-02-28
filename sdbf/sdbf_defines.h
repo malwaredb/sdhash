@@ -64,16 +64,6 @@
 #define BIGFILTER      16384
 #define BIGFILTER_ELEM   8738
 
-// ugly ugly cpuid check.  have to include it for OS X/Linux on same compile
-
-#ifndef _WIN32
-
-#define local_cpuid(func,ax,bx,cx,dx)\
-    __asm__ __volatile__ ("cpuid":\
-    "=a" (ax), "=b" (bx), "=c" (cx), "=d" (dx) : "a" (func));
-
-#endif
-
 // P-threading task spesicification structure for matching SDBFs 
 typedef struct {
     uint32_t  tid;            // Thread id

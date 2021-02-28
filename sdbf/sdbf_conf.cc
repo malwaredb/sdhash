@@ -6,11 +6,6 @@
 #include "sdbf_conf.h"
 #include "sdbf_defines.h"
 
-#ifdef _WIN32
-#include <intrin.h>
-#endif
-
-
 /** constructor for sdbf_conf object. 
     takes thread_count, warnings, max elements in BF
 */
@@ -30,26 +25,7 @@ sdbf_conf::sdbf_conf(uint32_t thread_cnt, uint32_t warnings, uint32_t max_elem_c
     init_bit_count_16();
     entr64_table_init_int();
     memset( bf_est_cache, 0, sizeof( bf_est_cache));
-    //this is popcnt instruction check
-#ifdef _M_IX86
 	this->popcnt=false;
-#else 
-#ifndef _WIN32
-    unsigned int a,b,c,d;
-    local_cpuid(1,a,b,c,d); 
-    if (c & (1 << 23))
-    	this->popcnt=true;    
-    else
-    	this->popcnt=false;    
-#else // if windows can use intrinsic. 
-    int cpuinfo[4];
-    __cpuid(cpuinfo,1);
-    if (cpuinfo[2] & ( 1 << 23))
-    	this->popcnt=true;    
-    else
-    	this->popcnt=false;    
-#endif
-#endif
 }
 
 /** destructor
