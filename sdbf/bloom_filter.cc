@@ -8,9 +8,6 @@
 #include <sstream>
 #include <bits/stdc++.h>
 #include <boost/lexical_cast.hpp>
-//#ifndef _M_IX86
-//#include <smmintrin.h>
-//#endif
 
 #include <boost/math/special_functions/round.hpp>
 

@@ -10,7 +10,6 @@
 #include <fstream>
 #include <sstream>
 #include <boost/lexical_cast.hpp>
-#include <smmintrin.h>
 
 #include <boost/math/special_functions/round.hpp>
 
