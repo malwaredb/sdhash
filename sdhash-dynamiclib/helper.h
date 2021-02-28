@@ -5,7 +5,11 @@
 
 #ifdef __cplusplus
 extern "C" {
-    void shash_from_buffer(char* fname, char* buffer, uint64_t buffLen, char* sdhash_dest, uint64_t* sdhash_len);
+#endif
+
+char* sdhash_from_buffer_simple(char* fname, char* buffer, uint64_t buffLen);
+
+#ifdef __cplusplus
 }
 #endif
 

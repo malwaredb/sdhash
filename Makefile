@@ -86,7 +86,13 @@ $(LIBSDBF): $(SDBF_OBJ)
 	ar r $(LIBSDBF) $(SDBF_OBJ)
 
 libsdhash.so: $(SDHASHLIB_OBJ) $(SDBF_OBJ)
-	$(LD) --shared $(SDHASHLIB_OBJ) $(LIBSDBF) -fPIC -o libsdhash.so
+	$(LD) --shared $(SDHASHLIB_OBJ) $(LIBSDBF) external/stage/lib/libboost_thread.a external/stage/lib/libboost_system.a $(LDFLAGS) -fPIC -o libsdhash.so
+
+installsharedlib: libsdhash.so
+	cp libsdhash.so $(PREFIX)/lib/
+	mkdir $(PREFIX)/include/libsdhash/
+	cp sdhash-dynamiclib/*.h $(PREFIX)/include/libsdhash/
+	ldconfig
 
 stream: $(SDHASH_OBJ) $(LIBSDBF)
 	$(LD) $(SDHASH_OBJ) $(SDHASH_CLIENT_OBJ) $(LIBSDBF) -o sdhash $(LDFLAGS) 

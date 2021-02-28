@@ -2,12 +2,14 @@
 #include "sdhash.h"
 #include <stdio.h>
 #include <string.h>
+#include <string>
 
 extern "C" {
-    void shash_from_buffer(char* fname, char* buffer, uint64_t buffLen, char* sdhash_dest, uint64_t* sdhash_len) {
+    char* sdhash_from_buffer_simple(char* fname, char* buffer, uint64_t buffLen) {
         string filename(fname);
         string sdhash_result = sdhash_buffer(filename, buffer, buffLen);
-        strcpy(sdhash_dest, sdhash_result.c_str());
-        *sdhash_len = (uint64_t) strlen(sdhash_result.c_str());
+        char* temp = (char*) malloc(sizeof(char*) * sdhash_result.length());
+        strcpy(temp, sdhash_result.c_str());
+        return temp;
     }
 }
