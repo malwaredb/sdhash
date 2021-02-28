@@ -1,5 +1,7 @@
 #include <string>
 #include <fstream>
+#include <iostream>
+#include <sys/stat.h>
 #include "../sdbf/sdbf_class.h"
 #include "../sdbf/sdbf_defines.h"
 #include "../sdbf/sdbf_set.h"
@@ -22,7 +24,7 @@ string sdhash_file(string file_path) {
     info->search_deep=false;
     info->search_first=false;
     info->basename=false;
-    class sdbf sdbfm(file_path.c_str(), &is, 4*KB, fsize, info);
+    class sdbf sdbfm(file_path.c_str(), &is, 0, fsize, info);
     free(info);
     return sdbfm.to_string();
 }
@@ -35,7 +37,7 @@ string sdhash_buffer(string file_name, char* buffer, uint64_t length) {
     info->search_deep=false;
     info->search_first=false;
     info->basename=false;
-    class sdbf sdbfm(file_name.c_str(), buffer, 4*KB, length, info);
+    class sdbf sdbfm(file_name.c_str(), buffer, 0, length, info);
     free(info);
     return sdbfm.to_string();
 }

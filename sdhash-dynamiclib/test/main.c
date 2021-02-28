@@ -13,8 +13,14 @@ int main(int argc, char* argv[]) {
 	unsigned char* buffer = (unsigned char*) malloc(sizeof(unsigned char) * sz);
 	fread(buffer, sizeof(unsigned char), sz, f);
 
-	char* sdhashBuff = sdhash_from_buffer_simple(argv[0], buffer, sz);
-	printf("%s\n", sdhashBuff);
+	char* sdhashBuff = sdhash_from_buffer(argv[0], buffer, sz);
+	printf("Buffer:\n%s\n", sdhashBuff);
+    free(buffer);
+    buffer = NULL;
+    fclose(f);
+
+    sdhashBuff = sdhash_from_path(argv[0]);
+    printf("Path:\n%s\n", sdhashBuff);
 
 	return 0;
 }

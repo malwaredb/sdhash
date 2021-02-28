@@ -7,7 +7,8 @@
 extern "C" {
 #endif
 
-char* sdhash_from_buffer_simple(char* fname, char* buffer, uint64_t buffLen);
+char* sdhash_from_buffer(char* fname, char* buffer, uint64_t buffLen);
+char* sdhash_from_path(char* fname);
 
 #ifdef __cplusplus
 }
